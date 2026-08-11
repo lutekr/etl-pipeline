@@ -29,14 +29,16 @@ Rebuilding it from scratch, instead of patching the old code, was the whole poin
 
 - **Python 3.11** (it uses parenthesized context managers, which need 3.10+, and `STRICT` tables, which need a recent SQLite)
 - **SQLite** (through the standard-library `sqlite3` module)
-- **No external dependencies — standard library only** (`csv`, `sqlite3`, `logging`, `pathlib`, `contextlib`, `typing`)
+- **No external dependencies in the pipeline — standard library only** (`csv`, `sqlite3`, `logging`, `pathlib`, `contextlib`, `typing`). `pytest` is used for the tests.
 
 ## Project structure
 
 ```
 project/
 ├── etl_v2.py          # the whole pipeline: extract, transform, load, main
+├── test_etl.py        # pytest tests
 ├── arizona_data.csv   # source data
+├── .gitignore
 └── events.log         # created on each run: log of skipped/loaded rows and errors
 ```
 
@@ -47,6 +49,23 @@ python etl_v2.py
 ```
 
 This creates `offers.db`, runs the pipeline, and writes `events.log`. To start from a clean state, delete `offers.db` first (or call `delete_files()`), because re-running the pipeline appends rows to the existing table.
+
+## Tests
+
+```bash
+pip install pytest
+pytest
+```
+
+Three tests cover the transform step and the error path:
+
+- valid rows survive cleaning and come out with the right types
+- a row with invalid values is skipped and counted, not raised
+- a missing file raises `FileNotFoundError`
+
+Both `iter_raw_file` and `data_cleaner` are generators, so the tests consume them
+with `list(...)`. Without that the function body never runs and the test would
+pass without testing anything.
 
 ## Note
 
