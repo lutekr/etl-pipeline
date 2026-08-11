@@ -15,3 +15,7 @@ venv/
 
 # Draft / scratch (not part of the project)
 README_DRAFT.md
+
+# Local scratch — notes, experiments, unrelated scripts, recruitment docs.
+# Nothing in here is part of the project and nothing here is ever published.
+_scratch/
